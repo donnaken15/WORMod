@@ -1,11 +1,22 @@
-#"0xd45c7cdd" = $#"0xfb849dbe"
-#"0xbe4e727b" = {
+StarPower_Out_SFX_struct = $#"0xfb849dbe"
+StarPower_Out_SFX_container = {
 	Command = PlaySound
 	Randomness = None
 	Sounds = {
 		Sound1 = {
-			#"0x05c3c4a8"
+			sp_lose
 			vol = 80
+		}
+	}
+}
+Star_SFX_struct = $#"0xfb849dbe"
+Star_SFX_container = {
+	Command = PlaySound
+	Randomness = None
+	Sounds = {
+		Sound1 = {
+			star
+			vol = 110
 		}
 	}
 }
@@ -461,7 +472,6 @@ script StarSequenceFX
 					id = <nameH>
 					parent = <container_id>
 					material = Note_Hit_Xplosion1
-					rgba = [255 255 255 255]
 					Pos = <pos2d>
 					rot_angle = 0
 					Scale = 2.0
@@ -1312,6 +1322,139 @@ script Kill_Highway_Star_Power_Effect
 	DestroyScreenElement id = <namer2>
 endscript
 
+script complete_star
+	SetSpawnInstanceLimits \{Max = 1 management = ignore_spawn_request}
+	wait \{0.3 seconds}
+	SoundEvent \{event = Star_SFX}
+	ExtendCrc HUD2D_score_star_1 <player_text> out = parent_cont
+	if NOT ScreenElementExists id = <parent_cont>
+		return
+	endif
+	//id = hud_star_meter_id
+	//if NOT <id> ::Desc_ResolveAlias name = alias_Star_Earn_FX param = Parent_Cont
+		//return
+	//endif
+	colorin = [255 200 0 255]
+	colorout = [0 0 0 255]
+	DestroyScreenElement \{id = Star_Meter_Counter_glow01}
+	DestroyScreenElement \{id = Star_Meter_Counter_glow02}
+	pos = (56.0, 48.0)
+	CreateScreenElement {
+		Type = SpriteElement
+		id = Star_Meter_Counter_glow01
+		parent = <Parent_Cont>
+		material = tubeglow02
+		rgba = [255 200 64 255]
+		alpha = 0
+		dims = (228.0, 228.0)
+		Pos = <pos>
+		Scale = (1.0, 1.0)
+		rot_angle = 0
+		just = [center center]
+		pos_anchor = [center center]
+		z_priority = 29
+	}
+	CreateScreenElement {
+		Type = SpriteElement
+		id = Star_Meter_Counter_glow02
+		parent = <Parent_Cont>
+		material = tubeglow02
+		rgba = [255 200 64 255]
+		alpha = 0
+		dims = (128.0, 128.0)
+		Pos = <pos>
+		Scale = (1.0, 1.0)
+		rot_angle = 0
+		just = [center center]
+		pos_anchor = [center center]
+		z_priority = 30
+	}
+	ExtendCrc starflash_0 <player_text> out = RP_FX01
+	Create2DParticleSystem {
+		Pos = <pos>
+		z_priority = 29
+		material = sys_Particle_lnzflare02_sys_Particle_lnzflare02
+		parent = <Parent_Cont>
+		start_color = [255 255 128 255]
+		end_color = [255 128 0 0]
+		start_scale = (0.25, 0.25)
+		end_scale = (1.0, 1.0)
+		start_angle_spread = 0.0
+		min_rotation = -180
+		max_rotation = 360
+		emit_start_radius = 6
+		emit_radius = 6
+		Emit_Rate = 0.00151
+		emit_dir = 0.0
+		emit_spread = 360.0
+		velocity = 6.1000004
+		friction = (0.0, 12.0)
+		id = <RP_FX01>
+		time = 0.2
+	}
+	ExtendCrc starflash_1 <player_text> out = RP_FX02
+	Create2DParticleSystem {
+		parent = <Parent_Cont>
+		Pos = <pos>
+		z_priority = 29
+		material = sys_Particle_Spark01_sys_Particle_Spark01
+		start_color = <colorin>
+		end_color = [255 255 255 0]
+		start_scale = (0.5, 0.5)
+		end_scale = (1.5, 1.5)
+		start_angle_spread = 360.0
+		min_rotation = 0
+		max_rotation = 360
+		emit_start_radius = 10
+		emit_radius = 0.5
+		Emit_Rate = 0.005
+		emit_dir = 0.0
+		emit_spread = 360.0
+		velocity = 2
+		friction = (-3.009999990463257, 6.0)
+		id = <RP_FX02>
+		time = 0.5
+	}
+	ExtendCrc starflash_2 <player_text> out = RP_FX03
+	Create2DParticleSystem {
+		parent = <Parent_Cont>
+		Pos = <pos>
+		z_priority = 30
+		material = sys_Particle_Spark01_sys_Particle_Spark01
+		start_color = [255 255 255 255]
+		end_color = <colorout>
+		start_scale = (1.5, 1.5)
+		end_scale = (5.5, 0.15000000596046448)
+		start_angle_spread = 360.0
+		min_rotation = 0
+		max_rotation = 360
+		emit_start_radius = 10
+		emit_radius = 0.5
+		Emit_Rate = 0.01
+		emit_dir = 0.0
+		emit_spread = 360.0
+		velocity = 2
+		friction = (0.0, 0.0)
+		id = <RP_FX03>
+		time = 0.3
+	}
+	wait \{0.1 Seconds}
+	Destroy2DParticleSystem id = <RP_FX01> kill_when_empty
+	if ScreenElementExists \{id = Star_Meter_Counter_glow01}
+		SetScreenElementProps \{id = Star_Meter_Counter_glow01 alpha = 1 time = 0.1}
+		SetScreenElementProps \{id = Star_Meter_Counter_glow02 alpha = 1 time = 0.1}
+	endif
+	wait \{0.25 Seconds}
+	if ScreenElementExists \{id = Star_Meter_Counter_glow01}
+		SetScreenElementProps \{id = Star_Meter_Counter_glow01 alpha = 0 time = 0.3}
+		SetScreenElementProps \{id = Star_Meter_Counter_glow02 alpha = 0 time = 0.3}
+	endif
+	//wait \{0.3 seconds}
+	DestroyScreenElement \{id = Star_Meter_Counter_glow01}
+	Destroy2DParticleSystem id = <RP_FX02> kill_when_empty
+	Destroy2DParticleSystem id = <RP_FX03> kill_when_empty
+endscript
+
 script rock_back_and_forth_star_meter
 endscript
 
@@ -1774,94 +1917,104 @@ gem_end_scale2 = 0.75
 string_scale_y2 = 0.6
 
 script #"0x99719b14"
-	ExtendCrc #"0xcccf93ce" ($<player_status>.text)out = Needle
-	if (ScreenElementExists id = <Needle>)
-		health = (0.5 * $<player_status>.current_health)
-		c1 = (2 - (4 * $#"0xb8d68ee1"))
-		c2 = ((4 * $#"0xb8d68ee1")- 1)
-		#"0x5d60e3ad" = (((<c1> * <health>)* <health>)+ (<c2> * <health>))
-		#"0x18b232c8" = ($#"0xf81f86d7" - $#"0xfbec6698")
-		Pos = ($#"0xfbec6698" + (<#"0x5d60e3ad"> * <#"0x18b232c8">))
-		Scale = ((($#"0x2ce68ed8" - $#"0xfb0d3c99")* <#"0x5d60e3ad">)+ $#"0xfb0d3c99")
-		SetScreenElementProps id = <Needle> Pos = <Pos>
-		SetScreenElementProps id = <Needle> Scale = <Scale>
-		if (<health> >= (0.5 * $health_medium_good))
-			rgba = $#"0xb6ac2f81"
-		elseif (<health> >= (0.5 * $health_poor_medium))
-			rgba = $#"0xdcf09d3c"
-		else
-			rgba = $#"0x8fb6f5f6"
+	if NOT (<last_health> = ($<player_status>.current_health))
+		<last_health> = ($<player_status>.current_health)
+		ExtendCrc #"0xcccf93ce" <player_text> out = Needle
+		if (ScreenElementExists id = <Needle>)
+			health = (0.5 * $<player_status>.current_health)
+			c1 = (2 - (4 * $#"0xb8d68ee1"))
+			c2 = ((4 * $#"0xb8d68ee1")- 1)
+			#"0x5d60e3ad" = (((<c1> * <health>)* <health>)+ (<c2> * <health>))
+			#"0x18b232c8" = ($#"0xf81f86d7" - $#"0xfbec6698")
+			Pos = ($#"0xfbec6698" + (<#"0x5d60e3ad"> * <#"0x18b232c8">))
+			Scale = ((($#"0x2ce68ed8" - $#"0xfb0d3c99")* <#"0x5d60e3ad">)+ $#"0xfb0d3c99")
+			SetScreenElementProps id = <Needle> Pos = <Pos>
+			SetScreenElementProps id = <Needle> Scale = <Scale>
+			if (<health> >= (0.5 * $health_medium_good))
+				rgba = $#"0xb6ac2f81"
+			elseif (<health> >= (0.5 * $health_poor_medium))
+				rgba = $#"0xdcf09d3c"
+			else
+				rgba = $#"0x8fb6f5f6"
+			endif
+			ExtendCrc #"0x42b328e7" <player_text> out = #"0x15834eea"
+			SetScreenElementProps id = <#"0x15834eea"> rgba = <rgba>
 		endif
-		ExtendCrc #"0x42b328e7" ($<player_status>.text)out = #"0x15834eea"
-		SetScreenElementProps id = <#"0x15834eea"> rgba = <rgba>
+		return last_health = <last_health>
 	endif
 endscript
 
 script #"0x337a7967"
-	ExtendCrc #"0x0500c035" ($<player_status>.text)out = #"0xae091b7d"
-	ExtendCrc #"0x95a37ec5" ($<player_status>.text)out = #"0x18b23fd9"
-	if (ScreenElementExists id = <#"0xae091b7d">)
-		base_score = ($<player_status>.base_score)
-		score = ($<player_status>.score)
-		#"0x039f4780" = (<score> / <base_score>)
-		if (<#"0x039f4780"> >= 2.8)
-			stars = 5
-			Progress = 1.0
-		elseif (<#"0x039f4780"> >= 2.0)
-			stars = 4
-			Progress = ((<#"0x039f4780"> - 2.0)/ 0.8)
-		elseif (<#"0x039f4780"> >= 0.9)
-			stars = 3
-			Progress = ((<#"0x039f4780"> - 0.9)/ 1.1)
-		elseif (<#"0x039f4780"> >= 0.65)
-			stars = 2
-			Progress = ((<#"0x039f4780"> - 0.65)/ 0.25)
-		elseif (<#"0x039f4780"> >= 0.1)
-			stars = 1
-			Progress = ((<#"0x039f4780"> - 0.1)/ 0.55)
-		else
-			stars = 0
-			Progress = (<#"0x039f4780"> / 0.1)
-		endif
-		FormatText checksumName = #"0x295fafd5" 'HUD2D_score_star_%d' d = <stars>
-		ExtendCrc <#"0x295fafd5"> ($<player_status>.text)out = #"0x295fafd5"
-		SetScreenElementProps id = <#"0x295fafd5"> alpha = 1
-		dims = ((($#"0xb9828f7c" * <Progress>)* (1.0, 0.0))+ ($#"0xd5189206" * (0.0, 1.0)))
-		SetScreenElementProps id = <#"0xae091b7d"> dims = <dims>
-		end_pos = ((($#"0xb9828f7c" * <Progress>)* (1.0, 0.0))+ $#"0x1d41c861")
-		ExtendCrc #"0x4ae39f0b" ($<player_status>.text)out = #"0x52d3e74a"
-		SetScreenElementProps id = <#"0x52d3e74a"> Pos = <end_pos>
-	endif
-	if (ScreenElementExists id = <#"0x18b23fd9">)
-		if ($game_mode = training)
-			completion = 1.0
-		else
-			time = ($current_time - $current_starttime)
-			completion = (<time> / ($#"0x2b3eb5da" / 1000.0))
-		endif
-		dims = ((($#"0xd22c1054" * <completion>)* (1.0, 0.0))+ ($#"0xe0c69463" * (0.0, 1.0)))
-		SetScreenElementProps id = <#"0x18b23fd9"> dims = <dims>
-		end_pos = ((($#"0xd22c1054" * <completion>)* (1.0, 0.0))+ $#"0x9b53cde3")
-		ExtendCrc #"0x766026d8" ($<player_status>.text)out = #"0x52d3e74a"
-		SetScreenElementProps id = <#"0x52d3e74a"> Pos = <end_pos>
-	endif
-	ExtendCrc HUD2D_score_star_6 ($<player_status>.text)out = #"0xf8548acc"
-	if (ScreenElementExists id = <#"0xf8548acc">)
-		if ($<player_status>.max_notes > 0)
-			#"0x593a11c3" = (100 * ($<player_status>.notes_hit / $<player_status>.max_notes))
-			if (<#"0x593a11c3"> = 100)
-				SetScreenElementProps id = <#"0xf8548acc"> alpha = 1
+	if NOT (<last_score> = $<player_status>.score)
+		last_score = ($<player_status>.score)
+		if ScreenElementExists id = <#"0xae091b7d">
+			base_score = ($<player_status>.base_score)
+			score = ($<player_status>.score)
+			#"0x039f4780" = (<score> / <base_score>)
+			if (<#"0x039f4780"> >= 2.8)
+				stars = 5
+				Progress = 1.0
+			elseif (<#"0x039f4780"> >= 2.0)
+				stars = 4
+				Progress = ((<#"0x039f4780"> - 2.0)/ 0.8)
+			elseif (<#"0x039f4780"> >= 0.9)
+				stars = 3
+				Progress = ((<#"0x039f4780"> - 0.9)/ 1.1)
+			elseif (<#"0x039f4780"> >= 0.65)
+				stars = 2
+				Progress = ((<#"0x039f4780"> - 0.65)/ 0.25)
+			elseif (<#"0x039f4780"> >= 0.1)
+				stars = 1
+				Progress = ((<#"0x039f4780"> - 0.1)/ 0.55)
+			else
+				stars = 0
+				Progress = (<#"0x039f4780"> / 0.1)
+			endif
+			if ($<player_status>.max_notes > 0)
+				#"0x593a11c3" = (100 * ($<player_status>.notes_hit / $<player_status>.max_notes))
+				if (<#"0x593a11c3"> = 100)
+					stars = 6
+				endif
+			endif
+			dims = ((($#"0xb9828f7c" * <Progress>)* (1.0, 0.0))+ ($#"0xd5189206" * (0.0, 1.0)))
+			SetScreenElementProps id = <#"0xae091b7d"> dims = <dims>
+			end_pos = ((($#"0xb9828f7c" * <Progress>)* (1.0, 0.0))+ $#"0x1d41c861")
+			ExtendCrc #"0x4ae39f0b" <player_text> out = #"0x52d3e74a"
+			SetScreenElementProps id = <#"0x52d3e74a"> Pos = <end_pos>
+			if NOT (<last_stars> = <stars>)
+				<old_stars> = <last_stars>
+				<last_stars> = <stars>
+				FormatText checksumName = #"0x295fafd5" 'HUD2D_score_star_%d' d = <stars>
+				ExtendCrc <#"0x295fafd5"> <player_text> out = #"0x295fafd5"
+				SetScreenElementProps id = <#"0x295fafd5"> alpha = 1
+				if NOT (<old_stars> = -1)
+					spawnscriptnow complete_star params = { <...> }
+				endif
 			endif
 		endif
+		if ScreenElementExists id = <#"0x18b23fd9">
+			if ($game_mode = training)
+				completion = 1.0
+			else
+				time = ($current_time - $current_starttime)
+				completion = (<time> / ($#"0x2b3eb5da" / 1000.0))
+			endif
+			dims = ((($#"0xd22c1054" * <completion>)* (1.0, 0.0))+ ($#"0xe0c69463" * (0.0, 1.0)))
+			SetScreenElementProps id = <#"0x18b23fd9"> dims = <dims>
+			end_pos = ((($#"0xd22c1054" * <completion>)* (1.0, 0.0))+ $#"0x9b53cde3")
+			ExtendCrc #"0x766026d8" <player_text> out = #"0x52d3e74a"
+			SetScreenElementProps id = <#"0x52d3e74a"> Pos = <end_pos>
+		endif
 	endif
+	return old_stars = <old_stars> last_stars = <last_stars>
 endscript
 
 script #"0x053b3781"
-	ExtendCrc #"0x3a74478c" ($<player_status>.text)out = #"0x15834eea"
+	ExtendCrc #"0x3a74478c" <player_text> out = #"0x15834eea"
 	if ScreenElementExists id = <#"0x15834eea">
 		SetScreenElementProps id = <#"0x15834eea"> alpha = 0
 	endif
-	ExtendCrc #"0x0500c035" ($<player_status>.text)out = #"0xa1fef351"
+	ExtendCrc #"0x0500c035" <player_text> out = #"0xa1fef351"
 	if ScreenElementExists id = <#"0xa1fef351">
 		rgba = $#"0x4ca1aa8d"
 		SetScreenElementProps id = <#"0xa1fef351"> rgba = <rgba>
@@ -1896,17 +2049,17 @@ script hud_sp_ready_flash
 	Destroy2DParticleSystem id = <sp_ready_flash> kill_when_empty
 endscript
 script #"0xf0ca5a38"
-	if ScreenElementExists id = <#"0x3552289a">
-		if ($<player_status>.star_power_amount > 0.0)
-			alpha = 1
-		else
-			alpha = 0
+	if NOT (<last_sp> = $<player_status>.star_power_amount)
+		<last_sp> = ($<player_status>.star_power_amount)
+		if ScreenElementExists id = <#"0x3552289a">
+			if ($<player_status>.star_power_amount > 0.0)
+				alpha = 1
+			else
+				alpha = 0
+			endif
+			SetScreenElementProps id = <#"0x3552289a"> alpha = <alpha>
 		endif
-		SetScreenElementProps id = <#"0x3552289a"> alpha = <alpha>
-	endif
-	if ScreenElementExists id = <#"0xe0a18aea">
-		if NOT (<last_sp> = $<player_status>.star_power_amount)
-			<last_sp> = ($<player_status>.star_power_amount)
+		if ScreenElementExists id = <#"0xe0a18aea">
 			if (<last_sp> >= 50.0 || $<player_status>.star_power_used = 1)
 				alpha = 1
 				if (<got_sp> = 0)
@@ -1916,13 +2069,10 @@ script #"0xf0ca5a38"
 				alpha = 0
 				got_sp = 0
 			endif
-			//if NOT (<got_sp> = $<player_status>.star_power_used)
-				//got_sp = ($<player_status>.star_power_used)
-				if (<got_sp> = 1 && $<player_status>.star_power_used = 0)
-					got_sp = 2
-					spawnscriptnow hud_sp_ready_flash params = { <...> }
-				endif
-			//endif
+			if (<got_sp> = 1 && $<player_status>.star_power_used = 0)
+				got_sp = 2
+				spawnscriptnow hud_sp_ready_flash params = { <...> }
+			endif
 			amount = (<last_sp> / 100.0)
 			Pos = (<amount> * (-5.0, -200.0))
 			Scale = (1.1 - (<amount> * 0.3))
@@ -1936,9 +2086,16 @@ script update_score_fast
 	UpdateScoreFastInit player_status = <player_status>
 	last_sp = -1.0
 	got_sp = 0
-	ExtendCrc #"0x60199acb" ($<player_status>.text)out = #"0x3552289a"
-	ExtendCrc HUD2D_SP_glow_end ($<player_status>.text)out = #"0xe0a18aea"
-	ExtendCrc particles_SP_ready_flash ($<player_status>.text)out = sp_ready_flash
+	last_health = -1.0
+	last_score = -1.0
+	last_stars = -1
+	old_stars = -1
+	player_text = ($<player_status>.text)
+	ExtendCrc #"0x60199acb" <player_text> out = #"0x3552289a"
+	ExtendCrc HUD2D_SP_glow_end <player_text> out = #"0xe0a18aea"
+	ExtendCrc particles_SP_ready_flash <player_text> out = sp_ready_flash
+	ExtendCrc #"0x0500c035" <player_text> out = #"0xae091b7d"
+	ExtendCrc #"0x95a37ec5" <player_text> out = #"0x18b23fd9"
 	begin
 		GetSongTimeMs
 		#"0x99719b14" <...>
