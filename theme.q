@@ -588,7 +588,7 @@ script StarSequenceFX
 		gem_count = (<gem_count> + 1)
 	repeat <array_Size>
 endscript
-#"0xe91f8a7f" = 0.266666666
+#"0xe91f8a7f" = 0.283333333
 
 Default_SP_FX_Color = {
 	White_255a = [
@@ -1392,6 +1392,7 @@ script complete_star
 		id = <RP_FX01>
 		time = 0.2
 	}
+	wait \{0.1 Seconds}
 	ExtendCrc starflash_1 <player_text> out = RP_FX02
 	Create2DParticleSystem {
 		parent = <Parent_Cont>
@@ -1438,7 +1439,6 @@ script complete_star
 		id = <RP_FX03>
 		time = 0.3
 	}
-	wait \{0.1 Seconds}
 	Destroy2DParticleSystem id = <RP_FX01> kill_when_empty
 	if ScreenElementExists \{id = Star_Meter_Counter_glow01}
 		SetScreenElementProps \{id = Star_Meter_Counter_glow01 alpha = 1 time = 0.1}
@@ -1672,7 +1672,7 @@ script setup_highway\{Player = 1}
 				id = <name_string>
 				parent = <container_id>
 				material = sys_String01_sys_String01
-				rgba = [200 200 200 200]
+				rgba = [255 255 255 255]
 				Scale = <string_scale>
 				rot_angle = ($button_models.<Color>.angle)
 				Pos = <string_pos2d>
@@ -1764,6 +1764,7 @@ script GuitarEvent_MissedNote
 	if ($show_play_log = 1)
 		output_log_text "Missed Note (%t)" t = <note_time> Color = orange
 	endif
+	player_text = (<player_status>.text)
 	#"0x053b3781" <...>
 endscript
 
@@ -1773,8 +1774,8 @@ script hit_note_fx
 	endif
 	NoteFX <...>
 	if ($#"0xd403a7a7" < 2)
-		Pos = (<Pos> + (0.0, 24.0))
-		SetScreenElementProps id = <fx_id> Pos = <Pos> Scale = (1.600000023841858, 1.600000023841858) relative_scale
+		Pos = (<Pos> + (0.0, 20.0))
+		SetScreenElementProps id = <fx_id> Pos = <Pos> Scale = (1.4, 1.4) relative_scale
 	endif
 	if ($#"0xd403a7a7" = 0)
 		wait 100 #"0x8d07dc15"
@@ -1887,8 +1888,18 @@ sidebar_normal0 = [
 sidebar_normal1 = $#"0xc9027eac"
 sidebar_starready0 = $#"0xc9027eac"
 sidebar_starready1 = $#"0xc9027eac"
-sidebar_dying0 = $#"0xc9027eac"
-sidebar_dying1 = $#"0xc9027eac"
+sidebar_dying0 = [
+	255
+	255
+	255
+	255
+]
+sidebar_dying1 = [
+	255
+	80
+	80
+	255
+]
 sidebar_starpower0 = $#"0xc9027eac"
 sidebar_starpower1 = $#"0xc9027eac"
 highway_normal = [
@@ -1945,8 +1956,20 @@ script #"0x99719b14"
 endscript
 
 script #"0x337a7967"
+	if NOT (<last_run> = $<player_status>.current_run)
+		last_run = ($<player_status>.current_run)
+		if (<last_run> >= 24)
+			FormatText textname = text '%d' d = <last_run>
+			SetScreenElementProps id = <streak_id> text = <text>
+		endif
+	endif
 	if NOT (<last_score> = $<player_status>.score)
 		last_score = ($<player_status>.score)
+		if ScreenElementExists id = <score_id>
+			CastToInteger \{last_score}
+			FormatText textname = text '%d' d = <last_score> usecommas
+			SetScreenElementProps id = <score_id> scale = 1.1 text = <text>
+		endif
 		if ScreenElementExists id = <#"0xae091b7d">
 			base_score = ($<player_status>.base_score)
 			score = ($<player_status>.score)
@@ -2006,7 +2029,7 @@ script #"0x337a7967"
 			SetScreenElementProps id = <#"0x52d3e74a"> Pos = <end_pos>
 		endif
 	endif
-	return old_stars = <old_stars> last_stars = <last_stars>
+	return old_stars = <old_stars> last_stars = <last_stars> last_run = <last_run> last_score = <last_score>
 endscript
 
 script #"0x053b3781"
@@ -2083,12 +2106,16 @@ script #"0xf0ca5a38"
 endscript
 
 script update_score_fast
+	if ($hudless = 1)
+		return
+	endif
 	UpdateScoreFastInit player_status = <player_status>
 	last_sp = -1.0
 	got_sp = 0
 	last_health = -1.0
 	last_score = -1.0
 	last_stars = -1
+	last_run = -1
 	old_stars = -1
 	player_text = ($<player_status>.text)
 	ExtendCrc #"0x60199acb" <player_text> out = #"0x3552289a"
@@ -2096,12 +2123,14 @@ script update_score_fast
 	ExtendCrc particles_SP_ready_flash <player_text> out = sp_ready_flash
 	ExtendCrc #"0x0500c035" <player_text> out = #"0xae091b7d"
 	ExtendCrc #"0x95a37ec5" <player_text> out = #"0x18b23fd9"
+	ExtendCrc HUD2D_Note_Streak_Text <player_text> out = streak_id
+	ExtendCrc HUD2D_Score_Text <player_text> out = score_id
 	begin
 		GetSongTimeMs
+		UpdateScoreFastPerFrame player_status = <player_status> time = <time>
 		#"0x99719b14" <...>
 		#"0x337a7967" <...>
 		#"0xf0ca5a38" <...>
-		UpdateScoreFastPerFrame player_status = <player_status> time = <time>
 		wait \{1 gameframe}
 	repeat
 endscript
@@ -2396,9 +2425,9 @@ script create_2d_hud_elements\{player_text = 'p1'}
 	if NOT ($game_mode = p2_battle || $boss_battle = 1)
 		ExtendCrc HUD2D_Score_Text <player_text> out = new_id
 		ExtendCrc HUD2D_score_container <player_text> out = new_score_container
-		score_text_pos = (222.0, 70.0)
+		score_text_pos = (233.0, 73.0)
 		if ($game_mode = p2_career || $game_mode = p2_coop)
-			<score_text_pos> = (226.0, 85.0)
+			<score_text_pos> = (222.0, 85.0)
 		endif
 		if ScreenElementExists id = <new_score_container>
 			displayText {
@@ -2407,34 +2436,31 @@ script create_2d_hud_elements\{player_text = 'p1'}
 				font = #"0xc0becb74"
 				Pos = <score_text_pos>
 				z = 20
-				Scale = (1.100000023841858, 1.100000023841858)
+				Scale = (1.1, 1.1)
 				just = [right right]
 				rgba = [255 255 255 255]
+				noshadow
 			}
-			SetScreenElementProps id = <id> font_spacing = 5
+			SetScreenElementProps id = <id> font_spacing = 3
 		endif
-		i = 1
-		begin
-			FormatText checksumName = note_streak_text_id 'HUD2D_Note_Streak_Text_%d' d = <i>
-			ExtendCrc <note_streak_text_id> <player_text> out = new_id
-			ExtendCrc HUD2D_note_container <player_text> out = new_note_container
-			if ScreenElementExists id = <new_note_container>
-				rgba = [230 230 230 200]
-				displayText {
-					parent = <new_note_container>
-					id = <new_id>
-					font = #"0x2706e673"
-					text = "0"
-					Pos = ((222.0, 78.0) + (<i> * (-37.0, 0.0)))
-					z = 25
-					just = [center center]
-					rgba = <rgba>
-					noshadow
-				}
-				<id> ::SetTags intial_pos = ((222.0, 78.0) + (<i> * (-37.0, 0.0)))
-			endif
-			<i> = (<i> + 1)
-		repeat 4
+		ExtendCrc HUD2D_Note_Streak_Text <player_text> out = new_id
+		ExtendCrc HUD2D_note_container <player_text> out = new_note_container
+		if ScreenElementExists id = <new_note_container>
+			displayText {
+				parent = <new_note_container>
+				id = <new_id>
+				font = #"0xc0becb74"
+				text = '0'
+				Pos = (176.0, 51.0)
+				z = 25
+				scale = 0.96
+				just = [right center]
+				rgba = [239 108 27 255]
+				noshadow
+			}
+			SetScreenElementProps id = <new_id> font_spacing = 3
+			<id> ::SetTags intial_pos = (210.0, 78.0)
+		endif
 	endif
 endscript
 
@@ -2730,7 +2756,7 @@ career_hud_2d_elements = {
 	offscreen_score_pos = (1368.0, 1500.0)
 	rock_pos = (450.0, 692.0)
 	score_pos = (1368.0, 768.0)
-	counter_pos = (1365.0, 820.0)
+	counter_pos = (1397.0, 828.7)
 	offscreen_rock_pos_p1 = (-500.0, 100.0)
 	offscreen_score_pos_p1 = (-500.0, 40.0)
 	rock_pos_p1 = (550.0, 100.0)
@@ -3225,6 +3251,7 @@ career_hud_2d_elements = {
 			element_parent = HUD2D_note_container
 			texture = #"0x38b63489"
 			pos_off = (0.0, 0.0)
+			scale = 0.78
 			zoff = 4
 		}
 		{
@@ -3594,9 +3621,10 @@ career_hud_2d_elements = {
 			element_parent = #"0xf1b083bb"
 			texture = #"0xd92726ac"
 			alpha = 1
-			zoff = 30
-			pos_off = (-20.0, -28.0)
-			Scale = 1.4
+			zoff = 27
+			blend = add
+			pos_off = (-4.0, -11.0)
+			Scale = 1.1
 		}
 	]
 }
