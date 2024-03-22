@@ -159,8 +159,6 @@ Battle_Power_Awarded_SFX_P2_container = {
 	}
 }
 star_power_bolt_scale = (3.0, 3.0)
-//whammy_top_width1 = 11.0
-//whammy_top_width2 = 9.5
 whammy_width_offset1 = 2.2
 sidebar_x_scale1 = 0.3
 string_scale_y1 = 0.75
@@ -180,18 +178,21 @@ open_fx_starpower_color2_start	=	$open_fx_starpower_color1_start
 open_fx_starpower_color2_end	=	$open_fx_starpower_color1_end
 
 script StarSequenceFX
-	if ($is_attract_mode = 1)
-		return
-	endif
-	Change StructureName = <player_status> sp_phrases_hit = ($<player_status>.sp_phrases_hit + 1)
-	SoundEvent \{event = Star_Power_Awarded_SFX}
 	ExtendCrc gem_container ($<player_status>.text) out = container_id
 	GetArraySize \{$#"0xd4b50263"}
 	Increment \{array_size}
 	gem_count = 0
 	begin
+		if (<gem_count> = 5)
+			gem_count = 7
+			color = yellow // hack maybe :/
+			// gemMutation open injection only applies to button_models global
+		endif
 		<note> = ($<song>[<array_entry>][(<gem_count> + 1)])
 		if (<note> > 0)
+			if (<gem_count> = 7)
+				gem_count = 2
+			endif
 			Color = ($gem_colors [<gem_count>])
 			if ($<player_status>.lefthanded_button_ups = 1)
 				<pos2d> = ($button_up_models.<Color>.left_pos_2d)
@@ -306,8 +307,14 @@ script StarSequenceFX
 	wait \{$#"0xe91f8a7f" seconds}
 	gem_count = 0
 	begin
-		<note> = ($<song> [<array_entry>] [(<gem_count> + 1)])
+		if (<gem_count> = 5)
+			gem_count = 7
+		endif
+		<note> = ($<song>[<array_entry>][(<gem_count> + 1)])
 		if (<note> > 0)
+			if (<gem_count> = 7)
+				gem_count = 2
+			endif
 			FormatText checksumName = name 'big_bolt%p%e' p = ($<player_status>.text)e = <gem_count> AddToStringLookup = true
 			DestroyScreenElement id = <name>
 			FormatText checksumName = fx_id 'big_bolt_particle%p%e' p = ($<player_status>.text)e = <gem_count> AddToStringLookup = true
@@ -326,192 +333,25 @@ endscript
 #"0xe91f8a7f" = 0.283333333
 
 Default_SP_FX_Color = {
-	White_255a = [
-		255
-		255
-		255
-		255
-	]
-	White_128a = [
-		255
-		255
-		255
-		128
-	]
-	White_64a = [
-		255
-		255
-		255
-		64
-	]
-	White_32a = [
-		255
-		255
-		255
-		32
-	]
-	White_0a = [
-		255
-		255
-		255
-		0
-	]
-	Color1_255a = [
-		0
-		255
-		255
-		255
-	]
-	Color1_128a = [
-		0
-		200
-		255
-		128
-	]
-	Color1_64a = [
-		0
-		255
-		255
-		64
-	]
-	Color1_32a = [
-		0
-		200
-		255
-		32
-	]
-	Color1_0a = [
-		0
-		255
-		255
-		0
-	]
-	Color2_255a = [
-		0
-		0
-		255
-		255
-	]
-	Color2_128a = [
-		0
-		0
-		255
-		128
-	]
-	Color2_64a = [
-		0
-		0
-		255
-		64
-	]
-	Color2_32a = [
-		0
-		0
-		255
-		32
-	]
-	Color2_0a = [
-		0
-		0
-		255
-		0
-	]
+	White_255a = [ 255 255 255 255 ]
+	White_128a = [ 255 255 255 128 ]
+	White_64a = [ 255 255 255 64 ]
+	White_32a = [ 255 255 255 32 ]
+	White_0a = [ 255 255 255 0 ]
+	Color1_255a = [ 0 255 255 255 ]
+	Color1_128a = [ 0 200 255 128 ]
+	Color1_64a = [ 0 255 255 64 ]
+	Color1_32a = [ 0 200 255 32 ]
+	Color1_0a = [ 0 255 255 0 ]
+	Color2_255a = [ 0 0 255 255 ]
+	Color2_128a = [ 0 0 255 128 ]
+	Color2_64a = [ 0 0 255 64 ]
+	Color2_32a = [ 0 0 255 32 ]
+	Color2_0a = [ 0 0 255 0 ]
 }
-/*Pandora_SP_FX_Color = {
-	White_255a = [
-		255
-		255
-		255
-		255
-	]
-	White_128a = [
-		255
-		255
-		255
-		128
-	]
-	White_64a = [
-		255
-		255
-		255
-		64
-	]
-	White_32a = [
-		255
-		255
-		255
-		32
-	]
-	White_0a = [
-		255
-		255
-		255
-		0
-	]
-	Color1_255a = [
-		255
-		128
-		128
-		255
-	]
-	Color1_128a = [
-		255
-		128
-		123
-		128
-	]
-	Color1_64a = [
-		255
-		128
-		123
-		64
-	]
-	Color1_32a = [
-		255
-		128
-		123
-		32
-	]
-	Color1_0a = [
-		255
-		128
-		123
-		0
-	]
-	Color2_255a = [
-		255
-		0
-		0
-		255
-	]
-	Color2_128a = [
-		255
-		0
-		0
-		128
-	]
-	Color2_64a = [
-		255
-		0
-		0
-		64
-	]
-	Color2_32a = [
-		255
-		0
-		0
-		32
-	]
-	Color2_0a = [
-		255
-		0
-		0
-		0
-	]
-}*///
 script Create_Highway_Star_Power_Effect
 	// and i thought i was autistic with my scripts
-	sp_params = Default_SP_FX_Color
+	//sp_params = Default_SP_FX_Color
 	formattext checksumname = player_status 'player%d_status' d = <player>
 	//star_power_multiplier = ($<player_status>.star_power_multiplier)
 	//if (<star_power_multiplier> >= 6)
@@ -522,21 +362,7 @@ script Create_Highway_Star_Power_Effect
 		//spawnscriptnow Create_Pandora_RP_FX_LVL1 params = {Player = <Player>}
 	//else
 	//endif
-	White_255a = (($<sp_params>).White_255a)
-	White_128a = (($<sp_params>).White_128a)
-	White_64a = (($<sp_params>).White_64a)
-	White_32a = (($<sp_params>).White_32a)
-	White_0a = (($<sp_params>).White_0a)
-	Color1_255a = (($<sp_params>).Color1_255a)
-	Color1_128a = (($<sp_params>).Color1_128a)
-	Color1_64a = (($<sp_params>).Color1_64a)
-	Color1_32a = (($<sp_params>).Color1_32a)
-	Color1_0a = (($<sp_params>).Color1_0a)
-	Color2_255a = (($<sp_params>).Color2_255a)
-	Color2_128a = (($<sp_params>).Color2_128a)
-	Color2_64a = (($<sp_params>).Color2_64a)
-	Color2_32a = (($<sp_params>).Color2_32a)
-	Color2_0a = (($<sp_params>).Color2_0a)
+	AddParams { ($Default_SP_FX_Color) }
 	height = ($highway_height)
 	Pos = ((0.0, -1.4) * <height>)
 	pos2 = ((0.0, 0.9) * <height>)
@@ -976,20 +802,21 @@ script Create_Highway_Star_Power_Effect
 		time = 1.0
 	}*///
 	wait \{0.25 seconds}
-	Destroy2DParticleSystem kill_when_empty id = <fx2>
-	Destroy2DParticleSystem kill_when_empty id = <fx3>
-	Destroy2DParticleSystem kill_when_empty id = <fxsr1>
-	Destroy2DParticleSystem kill_when_empty id = <fxsr2>
-	Destroy2DParticleSystem kill_when_empty id = <fxsr3>
-	Destroy2DParticleSystem kill_when_empty id = <fxsr4>
-	Destroy2DParticleSystem kill_when_empty id = <fxsl1>
-	Destroy2DParticleSystem kill_when_empty id = <fxsl2>
-	Destroy2DParticleSystem kill_when_empty id = <fxsl3>
+	//Destroy2DParticleSystem kill_when_empty id = <fx2>
+	//Destroy2DParticleSystem kill_when_empty id = <fx3>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsr1>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsr2>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsr3>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsr4>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsl1>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsl2>
+	//Destroy2DParticleSystem kill_when_empty id = <fxsl3>
 	wait \{0.25 seconds}
 	DestroyScreenElement id = <namel>
 	DestroyScreenElement id = <namer>
 	if ScreenElementExists id = <namel2>
-		/*<namel2> ::Obj_*/SpawnScriptNow pulse_SP_color params = {Player = <Player>}
+		/*<namel2> ::Obj_SpawnScriptNow*/
+		RunScriptOnScreenElement id = <namel2> pulse_SP_color params = {Player = <Player>}
 	endif
 endscript
 
@@ -1199,58 +1026,6 @@ endscript
 script hud_flip_note_streak_num
 endscript
 
-script miss_note
-	Change StructureName = <player_status> total_notes = ($<player_status>.total_notes + 1)
-	Change StructureName = <player_status> current_run = 0
-	if (($<player_status>.score)> 0)
-		#"0x053b3781" <...>
-	endif
-endscript
-
-script GuitarEvent_MissedNote
-	if ($#"0x6e482dae" = 1)
-		if (($<player_status>.text)= 'p1')
-			Player = 1
-			Change note_index_p1 = <array_entry>
-		elseif (($<player_status>.text)= 'p2')
-			Player = 2
-			Change note_index_p2 = <array_entry>
-		endif
-		set_solo_hit_buffer Player = <Player> 0
-	endif
-	if (<bum_note> = 1)
-		Guitar_Wrong_Note_Sound_Logic <...>
-	endif
-	if ($is_network_game & ($<player_status>.Player = 2))
-		if (<silent_miss> = 1)
-			spawnscriptnow highway_pulse_black params = {player_text = ($<player_status>.text)}
-		endif
-	else
-		if NOT ($<player_status>.guitar_volume = 0)
-			if (<silent_miss> = 1)
-				spawnscriptnow highway_pulse_black params = {player_text = ($<player_status>.text)}
-			else
-				Change StructureName = <player_status> guitar_volume = 0
-				UpdateGuitarVolume
-			endif
-		endif
-	endif
-	CrowdDecrease player_status = <player_status>
-	if ($always_strum = FALSE)
-		if ($disable_band = 0)
-			if CompositeObjectExists name = (<player_status>.band_member)
-				LaunchEvent Type = Anim_MissedNote target = (<player_status>.band_member)
-			endif
-		endif
-	endif
-	note_time = ($<song> [<array_entry>] [0])
-	if ($show_play_log = 1)
-		output_log_text "Missed Note (%t)" t = <note_time> Color = orange
-	endif
-	player_text = (<player_status>.text)
-	#"0x053b3781" <...>
-endscript
-
 script hit_note_fx
 	if ($disable_particles > 1)
 		return
@@ -1442,16 +1217,37 @@ script #"0x99719b14"
 endscript
 
 script #"0x337a7967"
-	total_run = ($player1_status.current_run + $player2_status.current_run)
-	if NOT (<last_run> = <total_run>)
-		last_run = <total_run>
+	if NOT ($game_mode = p2_career | $game_mode = p2_coop)
+		current_run = ($<player_status>.current_run)
+		total_notes = ($<player_status>.total_notes)
+		notes_hit = ($<player_status>.notes_hit)
+	else
+		current_run = ($player1_status.current_run + $player2_status.current_run)
+		total_notes = ($player1_status.total_notes + $player2_status.total_notes)
+		notes_hit = ($player1_status.notes_hit + $player2_status.notes_hit)
+	endif
+	if NOT (<last_run> = <current_run>)
+		last_run = <current_run>
 		if (<last_run> >= 24)
 			FormatText textname = text '%d' d = <last_run>
 			SetScreenElementProps id = <streak_id> text = <text>
 		endif
 	endif
+	if (<no_fc> = 0)
+		if NOT (<last_total> = <total_notes>)
+			last_total = <total_notes>
+			if (<notes_hit> < <total_notes>)
+				#"0x053b3781" <...>
+			endif
+		endif
+	endif
+	last_notes = ($player1_status.total_notes)
+	if NOT ($game_mode = p2_career | $game_mode = p2_coop)
+		total_score = ($<player_status>.score)
+	else
+		total_score = ($player1_status.score + $player2_status.score)
+	endif
 	// WTF happened here
-	total_score = ($player1_status.score + $player2_status.score)
 	if NOT (<last_score> = <total_score>)
 		last_score = <total_score>
 		if ScreenElementExists id = <score_id>
@@ -1531,6 +1327,7 @@ script #"0x053b3781"
 		rgba = $#"0x4ca1aa8d"
 		SetScreenElementProps id = <#"0xa1fef351"> rgba = <rgba>
 	endif
+	return \{no_fc = 1}
 endscript
 
 script hud_sp_ready_flash
@@ -1601,7 +1398,9 @@ script update_score_fast
 	last_score = -1.0
 	last_stars = -1
 	last_run = -1
+	last_total = 0
 	old_stars = -1
+	no_fc = 0
 	player_text = ($<player_status>.text)
 	get_song_end_time \{song = $current_song}
 	
@@ -1640,7 +1439,7 @@ script update_score_fast
 	repeat
 endscript
 
-script create_2d_hud_elements\{player_text = 'p1'}
+script create_2d_hud_elements \{player_text = 'p1'}
 	Change \{g_flash_red_going_p1 = 0}
 	Change \{g_flash_red_going_p2 = 0}
 	Change \{old_animate_bulbs_star_power_p1 = 0.0}

@@ -1,6 +1,0 @@
-donnaken15 - porting, proper starpower, particles, effects, extra materials, scripting
-WOR Mod Team - textures, scripting
-GHCripto - proper whammy textures
-Zedek - GHSDK (used for extra data extraction), script decompiler
-took some code directly from WOR
-
